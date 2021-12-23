@@ -92,7 +92,7 @@ setInterval(async () => {
       if (member.voice.channelID && !member.voice.serverMute) member.voice.setMute(true);
     }
   });
-}, 1000 * 60);
+}, 750);
 };
 
 module.exports.conf = {
