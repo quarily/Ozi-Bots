@@ -38,6 +38,7 @@ module.exports = {
     if (member && !member.bannable) return message.channel.send( "Bu üyeyi banlayamıyorum!").then(x=>x.delete({timeout:5000}))
     if (settings.banlimit > 0 && banLimit.has(message.author.id) && banLimit.get(message.author.id) == settings.banlimit) return message.channel.send("Saatlik ban sınırına ulaştın!").then(x=>x.delete({timeout:5000}))
     message.react(green)
+    if (settings.dmMessages) user.send(`**${message.guild.name}** sunucusundan, **${message.author.tag}** tarafından, **${reason}** sebebiyle banlandınız!`).catch(() => {});
     message.guild.members.ban(user.id, { reason: `${reason} | Yetkili: ${message.author.tag}` , days:1}).catch(() => {});
     const penal = await client.penalize(message.guild.id, user.id, "BAN", true, message.author.id, reason);
 
@@ -52,7 +53,6 @@ module.exports = {
 
     message.react(green)
     message.lineReply(messageEmbed);
-    if (settings.dmMessages) user.send(`**${message.guild.name}** sunucusundan, **${message.author.tag}** tarafından, **${reason}** sebebiyle banlandınız!`).catch(() => {});
 
     const log = embed
       .setDescription(`
