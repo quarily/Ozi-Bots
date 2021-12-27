@@ -10,6 +10,7 @@
 
 Theark ve Aris'e codeları için tesekkürler...
 
+![image](https://user-images.githubusercontent.com/92666466/147513264-07179317-e51a-43d1-bace-25d611c02c19.png)
 ![image](https://user-images.githubusercontent.com/92666466/145694537-015938d5-b724-47cc-b93a-bb63d95288fe.png)
 ![image](https://user-images.githubusercontent.com/92666466/144712859-7574c3e0-2f3c-4e60-8d57-4d9e9b5170bd.png)
 ![image](https://user-images.githubusercontent.com/92666466/144712851-feffdc3d-46d7-4bfc-addb-043bc4d6acba.png)
