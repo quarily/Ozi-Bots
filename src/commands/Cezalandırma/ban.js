@@ -63,13 +63,13 @@ ${kirmiziok} Ban Sebebi: \`${reason}\`
       .setFooter(`${moment(Date.now()).format("LLL")}`)
       message.guild.channels.cache.get(conf.banLogChannel).send(log);
 
-    const cezapuanData = await cezapuan.findOne({ guildID: message.guild.id, userID: member.user.id });
-    if(conf.cezapuanlog) message.guild.channels.cache.get(conf.cezapuanlog).send(`${member} üyesi ban cezası alarak toplam \`${cezapuanData ? cezapuanData.cezapuan : 0} ceza puanına\` ulaştı!`);
-
     await coin.findOneAndUpdate({ guildID: message.guild.id, userID: member.user.id }, { $inc: { coin: -100 } }, { upsert: true });
     await ceza.findOneAndUpdate({ guildID: message.guild.id, userID: member.user.id }, { $push: { ceza: 1 } }, { upsert: true });
     await ceza.findOneAndUpdate({ guildID: message.guild.id, userID: member.user.id }, { $inc: { top: 1 } }, { upsert: true });
     await cezapuan.findOneAndUpdate({ guildID: message.guild.id, userID: member.user.id }, { $inc: { cezapuan: 100 } }, { upsert: true });
+
+    const cezapuanData = await cezapuan.findOne({ guildID: message.guild.id, userID: member.user.id });
+    if(conf.cezapuanlog) message.guild.channels.cache.get(conf.cezapuanlog).send(`${member} üyesi ban cezası alarak toplam \`${cezapuanData ? cezapuanData.cezapuan : 0} ceza puanına\` ulaştı!`);
 
     if (settings.banlimit > 0) {
       if (!banLimit.has(message.author.id)) banLimit.set(message.author.id, 1);
@@ -80,3 +80,4 @@ ${kirmiziok} Ban Sebebi: \`${reason}\`
     }
   },
 };
+
