@@ -32,6 +32,6 @@ return;
 }
 message.react(green)
 message.lineReply(`${green} ${member} üyesinin sicili ${message.author} tarafından \`${moment(Date.now()).format("LLL")}\` tarihinde temizlendi!`)
-await penals.deleteMany({})
+await penals.deleteMany({userID: member.user.id, guildID: message.guild.id})
 }
 };
