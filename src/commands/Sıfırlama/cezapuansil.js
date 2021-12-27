@@ -35,6 +35,6 @@ return;
 message.react(green)
 message.lineReply(`${green} ${member} üyesinin ceza puanı ${message.author} tarafından \`${moment(Date.now()).format("LLL")}\` tarihinde temizlendi!`)
 await cezapuan.deleteMany({})
-await ceza.deleteMany({})
+await ceza.deleteMany({userID: member.user.id, guildID: message.guild.id})
 }
 };
