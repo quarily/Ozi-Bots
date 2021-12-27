@@ -18,15 +18,15 @@ if (!message.member.hasPermission("BAN_MEMBERS") &&  !conf.banHammer.some(x => m
 message.react(red)
 return 
 }
-const user =  message.mentions.members.first() || message.guild.members.cache.get(args[0]) || message.member;
-if (!user) { message.channel.send( "Böyle bir kullanıcı bulunamadı!").then(x=>x.delete({timeout:5000}))
+const member = message.mentions.members.first() || message.guild.members.cache.get(args[0]) || message.member;
+if (!member) { message.channel.send( "Böyle bir kullanıcı bulunamadı!").then(x=>x.delete({timeout:5000}))
 message.react(red)
 return 
 }
-const cezaData = await ceza.findOne({ guildID: message.guild.id, userID: user.user.id });
-const cezapuanData = await cezapuan.findOne({ guildID: message.guild.id, userID: user.user.id });
+const cezaData = await ceza.findOne({ guildID: settings.guildID, userID: member.id });
+const cezapuanData = await cezapuan.findOne({ guildID: settings.guildID, userID: member.user.id });
 message.react(green)
-message.lineReply(`${user} kişisinin toplamda \`${cezapuanData ? cezapuanData.cezapuan.length : 0}\` ceza puanı ve toplam ${cezaData ? cezaData.ceza.length : 0} cezası bulunmakta!`)
+message.lineReply(`${member} kişisinin toplamda \`${cezapuanData ? cezapuanData.cezapuan : 0}\` ceza puanı ve (Toplam **${cezaData ? cezaData.ceza.length : 0}** Ceza) olarak gözükmekte!`)
 },
 };
 
