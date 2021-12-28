@@ -65,7 +65,7 @@ setInterval(async () => {
     if (x.type === "TEMP-JAIL") {
       x.active = false;
       await x.save();
-      await member.setRoles(conf.unregister);
+      await member.setRoles(conf.unregRoles);
       client.channels.cache.get(conf.jailLogChannel).send(new MessageEmbed().setColor("#2f3136").setDescription(`${member.toString()} üyesinin jaili, süresi bittiği için kaldırıldı!`));
     } 
     if (x.type === "VOICE-MUTE") {
