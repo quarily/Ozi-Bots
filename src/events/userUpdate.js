@@ -58,14 +58,23 @@ Aktif taglı sayısı: ${guild.members.cache.filter(x => x.user.username.include
 
     }
   
-    const data = await bannedTag.findOne({ guildID: guild.id });
-    if (!data || !data.tags.length) return;
-    if (data.tags.some((x) => !oldUser.username.includes(x.tag) && newUser.username.includes(x.tag))) {
-      member.setRoles(conf.jailRole);
-      guild.channels.cache.get(conf.jailLogChannel).send(`${member.toString()}, sunucumuzdaki yasaklı taglardan birini aldığın için cezalıya atıldın!`);
-    } else if (data.tags.some((x) => oldUser.username.includes(x.tag) && !newUser.username.includes(x.tag))) {
-      member.setRoles(conf.unregister);
+await bannedTag.findOne({ guild: guild.id }, async ( err, res) => {
+    if (!res) return
+  res.taglar.forEach(async x => {
+    
+ if (!oldUser.username.includes(x) && newUser.username.includes(x)) {
+      !member.roles.cache.has(conf.boosterRolu) 
+      await member.roles.set(conf.jailRole).catch();
+     member.send(`${guild.name} adlı sunucumuza olan erişiminiz engellendi! Sunucumuzda yasaklı olan bir simgeyi (${x}) isminizde taşımanızdan dolayıdır. Sunucuya erişim sağlamak için simgeyi (${x}) isminizden çıkartmanız gerekmektedir.\n\nSimgeyi (${x}) isminizden kaldırmanıza rağmen üstünüzde halen Yasaklı Tag rolü varsa sunucudan gir çık yapabilirsiniz veya sağ tarafta bulunan yetkililer ile iletişim kurabilirsiniz. **-Yönetim**\n\n__Sunucu Tagımız__\n**${conf.tag}**`)
+    } else
+    if (oldUser.username.includes(x) && !newUser.username.includes(x)) { 
+      !member.roles.cache.has(conf.boosterRolu) 
+      await member.roles.set(conf.unregRoles).catch();
+    member.send(`${guild.name} adlı sunucumuza olan erişim engeliniz kalktı. İsminizden (${x}) sembolünü kaldırarak sunucumuza erişim hakkı kazandınız. Keyifli Sohbetler**-Yönetim**`)
     }
+})
+})
+
 };
 
 module.exports.conf = {
