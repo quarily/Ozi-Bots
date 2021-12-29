@@ -19,16 +19,13 @@ module.exports = {
   run: async (client, message, args, perm) => {
 
         if (!message.member.hasPermission("ADMINISTRATOR")) return
-        await bannedTag.findOne({ guild: message.guild.id }, async (err, res) => {
+        await bannedTag.findOne({ guildID: message.guild.id }, async (err, res) => {
             if (args[0] == "ekle") {
                 if (!args[1]) return message.lineReply("Yasaklıya atmak istediğin tagı belirtmelisin.", message.author, message.channel)
                 if (!res) {
                     let arr = []
                     arr.push(args[1])
-                    const newData = new bannedTag({
-                        guild: message.guild.id,
-                        taglar: arr
-                    })
+                    const newData = new bannedTag({ guildID: message.guild.id, taglar: arr })
                     newData.save().catch(e => console.log(e))
                     let üyeler = message.guild.members.cache.filter(x => {
                         return x.user.username.includes(args[1])
