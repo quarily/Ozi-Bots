@@ -1,8 +1,8 @@
 const { Schema, model } = require("mongoose");
 
 const schema = Schema({
-  guild: String,
-  taglar: Array
+  guildID: { type: String, default: "" },
+  taglar: { type: Array, default: [] }
 });
 
-module.exports = model("yasaklitag", schema);
+module.exports = model("bannedTag", schema);
