@@ -1,7 +1,6 @@
 const bannedTag = require("../../schemas/bannedTag");
 const { MessageEmbed } = require("discord.js");
 const moment = require("moment");
-const penals = require("../../schemas/penals");
 const conf = require("../../configs/sunucuayar.json")
 const settings = require("../../configs/settings.json")
 module.exports = {
@@ -17,72 +16,111 @@ module.exports = {
    * @param { Array<String> } args
    */
 
-  run: async (client, message, args, embed) => {
-    if (!message.member.hasPermission("ADMINISTRATOR")) return;
+  run: async (client, message, args, perm) => {
 
-    const data = await bannedTag.findOne({ guildID: message.guild.id });
-    if (["ekle", "add"].includes(args[0])) {
-      if (!args[1]) return message.channel.send("Bir tag giriniz!").then(x=>x.delete({timeout:5000}))
-      const filtered = message.guild.members.cache.filter((x) => x.user.username.includes(args[1]) && !conf.jailRole.some((a) => x.roles.cache.has(a)));
-      if (data && data.tags.length > 0 && data.tags.some((x) => x.tag === args[1])) return message.channel.send(`${args[1]} tagı zaten yasaklı taglar arasında!`).then(x=>x.delete({timeout:5000}))
-      await bannedTag.findOneAndUpdate({ guildID: message.guild.id }, { $push: { tags: args[1] } }, { upsert: true });
-      message.channel.send(`Başarıyla ${args[1]} tagı yasaklı taglar arasına eklendi ve ${filtered.size} kişi jaile atıldı!`).then(x=>x.delete({timeout:5000}))
-      filtered.forEach(async (x) => {
-        await x.roles.set(conf.jailRole);
-        const penal = await client.penalize(message.guild.id, x.user.id, "JAIL", true, client.user.id, `Kullanıcı adında yasaklı tag (\`${args[1]}\`) bulundurmak.`);
-        if (settings.dmMessages) x.send(`**${message.guild.name}** sunucusunda, kullanıcı adınızda yasaklı tag (\`${args[1]}\`) bulundurduğunuz için jaillendiniz!`).catch(() => {});
-        message.guild.channels.cache.get(conf.jailLogChannel).send(`${x.toString()}, kullanıcı adınızda yasaklı tag (\`${args[1]}\`) bulundurduğunuz için jaillendiniz!`);
+        if (!message.member.hasPermission("ADMINISTRATOR")) return
+        await bannedTag.findOne({ guild: message.guild.id }, async (err, res) => {
+            if (args[0] == "ekle") {
+                if (!args[1]) return message.lineReply("Yasaklıya atmak istediğin tagı belirtmelisin.", message.author, message.channel)
+                if (!res) {
+                    let arr = []
+                    arr.push(args[1])
+                    const newData = new bannedTag({
+                        guild: message.guild.id,
+                        taglar: arr
+                    })
+                    newData.save().catch(e => console.log(e))
+                    let üyeler = message.guild.members.cache.filter(x => {
+                        return x.user.username.includes(args[1])
+                    })
+                    await message.lineReply("**" + args[1] + "** tagında " + üyeler.size + " kişi bulundu hepsine yasaklı tag permi veriyorum.", message.author, message.channel)
+                   await bannedTag.findOneAndUpdate({ guildID: message.guild.id }, { $push: { tags: args[1] } }, { upsert: true });
+                    üyeler.map(x => {
+                        if (x.roles.cache.has(conf.jailRole)) return
+                        setTimeout(() => {
+                            x.roles.set(conf.jailRole)
+                        }, 1000)
+                    })
+                } else {
+                    let taglar = res.taglar
+                    if (taglar.includes(args[1])) return message.lineReply("Yasaklıya atmak istediğin tag veritabanında zaten yasaklı.", message.author, message.channel)
+                    res.taglar.push(args[1])
+                    res.save().catch(e => console.log(e))
+                   await bannedTag.findOneAndUpdate({ guildID: message.guild.id }, { $push: { tags: args[1] } }, { upsert: true });
+                    let üyeler = message.guild.members.cache.filter(x => {
+                        return x.user.username.includes(args[1])
+                    }) 
+                    await message.lineReply("**" + args[1] + "** tagında " + üyeler.size + " kişi bulundu hepsine yasaklı tag permi veriyorum.", message.author, message.channel)
+                    üyeler.map(x => {
+                        if (x.roles.cache.has(conf.jailRole)) return
+                        setTimeout(() => {
+                            x.roles.set(conf.jailRole)
+                        }, 1000)
+                       x.send(`${message.guild.name} adlı sunucumuza olan erişiminiz engellendi! Sunucumuzda yasaklı olan bir simgeyi (`+ args[1] +`) isminizde taşımanızdan dolayıdır. Sunucuya erişim sağlamak için simgeyi (`+ args[1] +`) isminizden çıkartmanız gerekmektedir.\n\nSimgeyi (`+ args[1] +`) isminizden kaldırmanıza rağmen üstünüzde halen Yasaklı Tag rolü varsa sunucudan gir çık yapabilirsiniz veya sağ tarafta bulunan yetkililer ile iletişim kurabilirsiniz. **-Yönetim**\n\n__Sunucu Tagımız__\n**${conf.tag}**`)
+                    })
 
-        const log = new MessageEmbed()
-          .setAuthor(x.user.username, x.user.avatarURL({ dynamic: true, size: 2048 }))
-          .setColor("#2f3136")
-          .setDescription(`
-${x.toString()} üyesi jaillendi!
+                }
+            }
 
-Ceza ID: \`#${penal.id}\`
-Jaillenen Üye: ${x.toString()} \`(${x.user.username.replace(/`/g, "")} - ${x.user.id})\`
-Jailleyen Yetkili: <@${client.user.id}> \`(${client.user.username} - ${client.user.id})\`
-Jail Tarihi: \`${moment(Date.now()).format("LLL")}\`
-Jail Sebebi: \`Kullanıcı adında yasaklı tag (${args[1]}) bulundurmak.\`
-          `);
-        message.guild.channels.cache.get(conf.jailLogChannel).send(log);
-      });
-    } else if (["sil", "remove"].includes(args[0])) {
-      if (!args[1]) return message.channel.send( "Bir tag giriniz!");
-      if (!data.tags.includes(args[1])) return message.channel.send(`Sunucunun yasaklı tagları arasında ${args[1]} tagı bulunmuyor!`).then(x=>x.delete({timeout:5000}))
-      data.tags = data.tags.filter((x) => !x.includes(args[1]));
-      data.save();
-      const filtered = message.guild.members.cache.filter((x) => x.user.username.includes(args[1]) && conf.jailRole.some((a) => x.roles.cache.has(a)));
-      message.channel.send(embed.setDescription(`Başarıyla ${args[1]} tagı yasaklı taglar arasından kaldırıldı ve ${filtered.size} kişi kayıtsıza atıldı!`)).then(x=>x.delete({timeout:5000}))
-      filtered.forEach(async (x) => {
-        const data = await penals.findOne({ userID: x.user.id, guildID: message.guild.id, type: "JAIL", active: true });
-        if (data) {
-          data.active = false;
-          await data.save();
-        }
-        await x.roles.set(conf.unregRoles);
-        if (settings.dmMessages) x.send(`**${message.guild.name}** sunucusunda, ${args[1]} tagı yasaklı taglar arasından kaldırıldı ve jailiniz açıldı.`).catch(() => {});
+            if (args[0] == "liste" && !args[1]) {
+                if (!res) return await message.lineReply("Sunucuda yasaklanmış tag bulunmamakta.", message.author, message.channel)
+                let num = 1
+                let arrs = res.taglar.map(x => `\`${num++}.\` ${x} - (${client.users.cache.filter(s => s.username.includes(x)).size} üye)`)
+                await message.lineReply(arrs.join("\n"), message.author, message.channel)
+            }
 
-        const log = new MessageEmbed()
-          .setAuthor(x.user.username, x.user.avatarURL({ dynamic: true, size: 2048 }))
-          .setColor("#2f3136")
-          .setDescription(`
-${x.toString()} üyesinin jaili kaldırıldı!
+            if (args[0] == "liste" && args[1] == "üye") {
+                if (!args[2]) await message.lineReply("Üyelerini listelemek istediğin yasaklı tagı belirtmelisin.", message.author, message.channel)
+                if (!res) return await message.lineReply("Veritabanında listelenecek yasaklı tag bulunmuyor.", message.author, message.channel)
+                if (!res.taglar.includes(args[2])) return await message.lineReply("**" + res.taglar.join(",") + "** tag(ları) sunucuda yasaklanmış durumdadır. Belirttiğin tag veritabanında bulunmuyor.", message.author, message.channel)
+                let üyeler = message.guild.members.cache.filter(x => {
+                    return x.user.username.includes(args[2])
+                }).map(x => "<@" + x.id + "> - (`" + x.id + "`)")
+                let üyelerk = message.guild.members.cache.filter(x => {
+                    return x.user.username.includes(args[2])
+                }).map(x => "" + x.user.tag + " - (`" + x.id + "`)")
+                let text = üyeler.join("\n")
+                let texto = üyelerk.join("\n")
+                const MAX_CHARS = 3 + 2 + text.length + 3;
+                if (MAX_CHARS > 2000) {
+                    message.channel.send("Sunucuda çok fazla yasaklı (" + args[2] + ") taga ait kişi var bu yüzden txt olarak göndermek zorundayım.", { files: [{ attachment: Buffer.from(texto), name: "yasakli-tagdakiler.txt" }] });
+                } else {
+                    message.channel.send(text)
+                }
+            }
 
-Jaili Kaldırılan Üye: ${x.toString()} \`(${x.user.username.replace(/`/g, "")} - ${x.user.id})\`
-Jaili Kaldıran Yetkili: <@${client.user.id}> \`(${client.user.username} - ${client.user.id})\`
-Jailin Kaldırılma Tarihi: \`${moment(Date.now()).format("LLL")}\`
-          `);
-        message.guild.channels.cache.get(conf.jailLogChannel).send(log);
-      });
-    } else if (["list", "liste"].includes(args[0])) {
-      if (!data || data && !data.tags.length) return message.channel.send( "Sunucuda herhangi bir yasaklı tag bulunmuyor!").then(x=>x.delete({timeout:5000}))
-      const filtered = message.guild.members.cache.filter((x) => new RegExp(data.tags.map((x) => x.tag).join("|"), "g").test(x.user.username));
-      message.channel.send(embed.setDescription(`
-\`${message.guild.name}\` sunucusunun yasaklı tagları;
-${data.tags.map((x) => `\`${x}\``).join(", ")}
-Toplam ${filtered.size} kişide ${data.tags.length > 1 ? data.tags.slice(0, -1).map(x => x).join(", ") + " veya " + data.tags.map(x => x).slice(-1) : data.tags.map(x => x).join("")} tagları bulunuyor!
-      `));
+            if (args[0] == "kaldır") {
+                if (!res) return await message.lineReply("Veritabanında kaldırılılacak yasaklı tag bulunmuyor.", message.author, message.channel)
+                if (!res.taglar.includes(args[1])) return await message.lineReply("Belirttiğin tag yasaklı tag listesinde bulunmuyor", message.author, message.channel)
+                let üyeler = message.guild.members.cache.filter(x => {
+                    return x.user.username.includes(args[1])
+                })
+                await message.lineReply("**" + args[1] + "** tagında " + üyeler.size + " kişi bulundu hepsineden yasaklı tag permini alıp sistemden tagı kaldırıyorum.", message.author, message.channel)
+                res.taglar = res.taglar.filter((x) => !x.includes(args[1]));
+                res.save().catch(e => console.log(e))
+                üyeler.map(x => {
+                    setTimeout(async () => {
+                        
+                    x.roles.set(conf.unregRoles)
+                    }, 1000);
+                    x.send(`${message.guild.name}  adlı sunucumuza olan erişim engeliniz kalktı. İsminizden (`+ args[1] +`) sembolünü kaldırarak sunucumuza erişim hakkı kazandınız. Keyifli Sohbetler**-Yönetim**`)
+                  })
+            }
+
+            if (args[0] == "kontrol") {
+                if (!res) return await message.lineReply("Veritabanında kontrol edilecek yasaklı tag bulunmuyor.", message.author, message.channel)
+                res.taglar.forEach(x => {
+                    let üye = message.guild.members.cache.filter(mems => {
+                        return mems.user.username.includes(x) && !mems.roles.cache.has(conf.jailRole)
+                    }).map(x => x.id)
+                    message.channel.send(`${x} tagı bulunup <@&${conf.jailRole}> rolü olmayan ${üye.length} kişiye rolü veriyorum.`)
+                    for (let i = 0; i < üye.length;i++) {
+                        setTimeout(() => {
+                            message.guild.members.cache.get(üye[i]).roles.set(conf.jailRole)
+                        }, (i + 1) * 1000)
+                    }
+                })
+            }
+        })
     }
-  },
-};
+}
