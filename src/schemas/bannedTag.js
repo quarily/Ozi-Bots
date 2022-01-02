@@ -6,3 +6,4 @@ const schema = Schema({
 });
 
 module.exports = model("bannedTag", schema);
+ 
