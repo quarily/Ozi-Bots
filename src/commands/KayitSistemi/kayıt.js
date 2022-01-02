@@ -215,10 +215,6 @@ await uye.roles.remove(ayar.erkekRolleri)
 
    });
 
-    collector.on("end", async () => {
-   msg.edit(`Cevap Verilmediği için İşlem Başarıyla İptal Edildi ${green}`,{components: null}); 
-    });
-
   }
 }   
 }
