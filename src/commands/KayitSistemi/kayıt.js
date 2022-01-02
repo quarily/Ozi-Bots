@@ -63,13 +63,12 @@ run: async (client, message, args, embed, prefix) => {
 
    const tagModedata = await regstats.findOne({ guildID: message.guild.id })
     if (tagModedata && tagModedata.tagMode === true) {
-    if(!uye.roles.cache.has("855159733048311818") && !uye.roles.cache.has(ayar.vipRole) && !uye.roles.cache.has(ayar.boosterRolu)) return message.lineReply(embed.setDescription(`${uye.toString()} isimli üyenin kullanıcı adında tagımız (\`†, Stârk, #1983\`) olmadığı, <@&${ayar.boosterRolu}>, <@&${ayar.vipRole}> Rolü olmadığı için isim değiştirmekden başka kayıt işlemi yapamazsınız.`));
+    if(!uye.roles.cache.has("855159733048311818") && !uye.roles.cache.has(ayar.vipRole) && !uye.roles.cache.has(ayar.boosterRolu)) return message.lineReply(embed.setDescription(`${uye.toString()} isimli üyenin kullanıcı adında tagımız (\`†, Shéw, #1983\`) olmadığı, <@&${ayar.boosterRolu}>, <@&${ayar.vipRole}> Rolü olmadığı için isim değiştirmekden başka kayıt işlemi yapamazsınız.`));
     }
 
-
     if(!yaş) 
-    { setName =`${conf.tag} ${isim}`;
-    } else { setName = `${conf.tag} ${isim} ' ${yaş}`;
+    { setName =`† ${isim}`;
+    } else { setName = `† ${isim} ' ${yaş}`;
   }
 
     uye.setNickname(`${setName}`).catch(err => message.lineReply(`İsim çok uzun.`))
@@ -106,7 +105,7 @@ run: async (client, message, args, embed, prefix) => {
 ${uye.toString()} kullanıcının adı başarıyla \`"${setName}"\` olarak değiştirildi.
 
 **Bu kişi daha önce şu isimlerle kayıt olmuş;**
-${data ? data.names.splice(0, 5).map((x, i) => `\`${i + 1}.\` \`${x.name}\` (${x.rol}) , (<@${x.yetkili}>)`).join("\n") : "Bu kullanıcı daha önce kayıt olmamış!"}
+${data ? data.names.splice(0, 5).map((x, i) => `\`${i + 1}.\` \`${x.name}\` (${x.rol}) , (<@${x.yetkili}>)`).join("\n") : ""}
     `)
 .setFooter(`Lütfen 30 saniye alttaki butonlara basarak kullanıcının cinsiyetini belirleyin.`)
 .setAuthor(uye.displayName, uye.user.displayAvatarURL({ dynamic: true }))
@@ -121,14 +120,17 @@ ${data ? data.names.splice(0, 5).map((x, i) => `\`${i + 1}.\` \`${x.name}\` (${x
       collector.on("collect", async (button) => {
 
 if(button.id === "MAN") {
-msg.delete();
 await button.reply.defer()
-message.lineReply(embed.setDescription(`
+let ozie = new MessageEmbed()
+
+.setDescription(`
 ${uye.toString()} sunucumuza <@${message.author.id}> tarafından, \`${setName}\` ismiyle ${conf.erkekRolleri.length > 1 ? conf.erkekRolleri.slice(0, -1).map(x => `<@&${x}>`).join(", ") + " ve " + conf.erkekRolleri.map(x => `<@&${x}>`).slice(-1) : conf.erkekRolleri.map(x => `<@&${x}>`).join("")} rolleri verilerek kayıt edildi!     
 `)
 .setFooter(`• Toplam kayıt: ${datas ? datas.top : 0} • Erkek kayıt : ${datas ? datas.erkek : 0} • Kadın kayıt : ${datas ? datas.kız : 0} • ${moment().calendar()}`)
 .setAuthor(uye.displayName, uye.user.displayAvatarURL({ dynamic: true }))
-.setThumbnail(uye.user.displayAvatarURL({ dynamic: true, size: 2048 })))
+.setThumbnail(uye.user.displayAvatarURL({ dynamic: true, size: 2048 }))
+
+msg.edit({components: null, embed: ozie}); 
 
     await uye.roles.add(ayar.erkekRolleri)
     await uye.roles.remove(ayar.kizRolleri)
@@ -161,14 +163,17 @@ if(ayar.chatChannel && client.channels.cache.has(ayar.chatChannel)) client.chann
 }
 
 if(button.id === "WOMAN") {
-msg.delete();
 await button.reply.defer()
- message.lineReply(embed.setDescription(`
+let ozik = new MessageEmbed()
+
+.setDescription(`
 ${uye.toString()} sunucumuza <@${message.author.id}> tarafından, \`${setName}\` ismiyle ${conf.kizRolleri.length > 1 ? conf.kizRolleri.slice(0, -1).map(x => `<@&${x}>`).join(", ") + " ve " + conf.kizRolleri.map(x => `<@&${x}>`).slice(-1) : conf.kizRolleri.map(x => `<@&${x}>`).join("")} rolleri verilerek kayıt edildi! 
 `)
 .setFooter(`• Toplam kayıt: ${datas ? datas.top : 0} • Kadın kayıt : ${datas ? datas.kız : 0} • Erkek kayıt : ${datas ? datas.erkek : 0} • ${moment().calendar()}`)
 .setAuthor(uye.displayName, uye.user.displayAvatarURL({ dynamic: true }))
-.setThumbnail(uye.user.displayAvatarURL({ dynamic: true, size: 2048 })))
+.setThumbnail(uye.user.displayAvatarURL({ dynamic: true, size: 2048 }))
+
+msg.edit({components: null, embed: ozik}); 
 
     await uye.roles.add(ayar.kizRolleri)
     await uye.roles.remove(ayar.erkekRolleri)
@@ -201,7 +206,7 @@ if(ayar.chatChannel && client.channels.cache.has(ayar.chatChannel)) client.chann
 }
 
 if(button.id === "İPTAL") {
-msg.delete();
+msg.edit(`İşlem Başarıyla İptal Edildi ${green}`,{components: null}); 
 uye.setNickname(`• İsim ' Yaş`)
 await uye.roles.add(ayar.unregRoles)
 await uye.roles.remove(ayar.kizRolleri)
@@ -211,7 +216,7 @@ await uye.roles.remove(ayar.erkekRolleri)
    });
 
     collector.on("end", async () => {
-      msg.delete();
+   msg.edit(`Cevap Verilmediği için İşlem Başarıyla İptal Edildi ${green}`,{components: null}); 
     });
 
   }
