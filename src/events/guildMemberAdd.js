@@ -72,7 +72,7 @@ if (Date.now() - member.user.createdTimestamp <= 1000 * 60 * 60 * 24 * 7) {
 await inviterSchema.findOneAndUpdate({ guildID: member.guild.id, userID: invite.inviter.id }, { $inc: { total: 1, fake: 1 } }, { upsert: true });
 const inviterData = await inviterSchema.findOne({ guildID: member.guild.id, userID: invite.inviter.id });
 const total = inviterData ? inviterData.total : 0;
-kayitchannel.wsend(`${star} ${member} Sunucumuza katıldı fakat hesabı 7 gün içerisinde açıldığı için şüpheli kısmına atıldı. ${red}`);
+kayitchannel.wsend(`${member} isimli üye sunucuya katıldı fakat hesabı \`` + moment(member.user.createdTimestamp).fromNow() + `\` açıldığı için şüpheli olarak işaretlendi.`);
 channel.wsend(`${member}, ${invite.inviter.tag} davetiyle katıldı! (**${total}**)`)
 member.roles.set(ayar.fakeAccRole)
 } else {
