@@ -62,6 +62,6 @@ ${data ? data.names.splice(0, 10).map((x, i) => `\`${i + 1}.\` \`${x.name}\` (${
     `)
 .setAuthor(uye.displayName, uye.user.displayAvatarURL({ dynamic: true }))
 .setThumbnail(uye.user.displayAvatarURL({ dynamic: true, size: 2048 })))
-    await isimler.findOneAndUpdate({ guildID: message.guild.id, userID: uye.user.id }, { $push: { names: { name: uye.displayName, yetkili: message.author.id,  rol: "İsim Komutu", date: Date.now() } } }, { upsert: true });
+    await isimler.findOneAndUpdate({ guildID: message.guild.id, userID: uye.user.id }, { $push: { names: { name: setName, yetkili: message.author.id,  rol: "İsim Değiştirme", date: Date.now() } } }, { upsert: true });
 
 }   }
