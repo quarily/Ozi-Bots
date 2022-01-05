@@ -5,6 +5,9 @@ const forceBans = require("../schemas/forceBans");
 require("moment-duration-format");
 moment.locale("tr");
 const conf = require("../configs/sunucuayar.json")
+require("moment-duration-format");
+moment.locale("tr");
+
 module.exports = async (guild, user) => {
   if (guild.id !== conf.guildID) return;
 
@@ -26,11 +29,10 @@ module.exports = async (guild, user) => {
     .setColor("GREEN")
     .setDescription(`
 \`(${user.username.replace(/\`/g, "")} - ${user.id})\` üyesinin banı kaldırıldı!
-
 Banı Kaldıran Yetkili: ${audit.executor} \`(${audit.executor.username.replace(/\`/g, "")} - ${audit.executor.id})\`
 Banın Kaldırılma Tarihi: \`${moment(Date.now()).format("LLL")}\`
       `)
-  guild.channels.cache.get(conf.banLogChannel).send(log);
+  guild.channels.cache.get(conf.penals.ban.log).send(log);
 };
 
 module.exports.conf = {
