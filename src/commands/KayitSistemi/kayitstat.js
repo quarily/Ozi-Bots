@@ -22,9 +22,9 @@ module.exports = {
       message.react(red)
       message.lineReply("Herhangi bir kayıt verisi bulunamadı!").then(x=>x.delete({timeout:5000})) 
       return }
-      registerTop = registerTop.filter((x) => message.guild.members.cache.has(x.userID)).splice(0, 10);
+      registerTop = registerTop.filter((x) => message.guild.members.cache.has(x.userID)).splice(0, 30);
       message.react(green)
-      message.lineReply(embed.setDescription(registerTop.map((x, i) => `\`${i + 1}.\` <@${x.userID}> Toplam **${x.top}** (\`${x.erkek} Erkek, ${x.kız} Kız\`)`)));
+      message.lineReply(embed.setDescription((registerTop.map((x, i) => `\`${i + 1}.\` <@${x.userID}> - Erkek __${x.erkek}__ Kadın __${x.kız}__`))))
     } else if (!args[0]) {
       const data = await regstats.findOne({ guildID: message.guild.id, userID: member.id });
       message.react(green)
