@@ -102,14 +102,15 @@ run: async (client, message, args, embed, prefix) => {
     message.react(green)
     let ozi = new MessageEmbed()
 .setDescription(`
-${uye.toString()} kullanıcının adı başarıyla \`"${setName}"\` olarak değiştirildi.
+${uye.toString()} üyesinin ismi "${setName}" olarak değiştirildi, bu üye daha önce bu isimlerle kayıt olmuş.
 
-**Bu kişi daha önce şu isimlerle kayıt olmuş;**
-${data ? data.names.splice(0, 5).map((x, i) => `\`${i + 1}.\` \`${x.name}\` (${x.rol}) , (<@${x.yetkili}>)`).join("\n") : ""}
+${red} üyesinin toplamda **${data ? `${data.names.length}` : "0"}** isim kayıtı bulundu
+${data ? data.names.splice(0, 3).map((x, i) => `\`${x.name}\` (${x.rol}) (<@${x.yetkili}>)`).join("\n") : "Daha önce kayıt olmamış."}
+
+Üyesinin önceki isimlerine \`.isimler <@Ozi/ID>\` komutuyla bakarak kayıt işlemini gerçekleştirmeniz önerilir.
     `)
+.setAuthor(message.guild.name, message.guild.iconURL({ dynamic: true, size: 2048 }))
 .setFooter(`Lütfen 30 saniye alttaki butonlara basarak kullanıcının cinsiyetini belirleyin.`)
-.setAuthor(uye.displayName, uye.user.displayAvatarURL({ dynamic: true }))
-.setThumbnail(uye.user.displayAvatarURL({ dynamic: true, size: 2048 }))
    
  let msg = await message.channel.send({ buttons : [ button_1, button_2, button_3 ], embed: ozi})
  
