@@ -53,15 +53,17 @@ run: async (client, message, args, embed, prefix) => {
     { setName = `${uye.user.username.includes(ayar.tag) ? ayar.tag : (ayar.ikinciTag ? ayar.ikinciTag : (ayar.tag || ""))} ${isim}`;
     } else { setName = `${uye.user.username.includes(ayar.tag) ? ayar.tag : (ayar.ikinciTag ? ayar.ikinciTag : (ayar.tag || ""))} ${isim} ' ${yaş}`;
   } uye.setNickname(`${setName}`).catch(err => message.lineReply(`İsim çok uzun.`))
+
     message.react(green)
     message.lineReply(embed.setDescription(`
-${uye.toString()} üyesinin ismi başarıyla ${setName} olarak değiştirildi!  
+${uye.toString()} üyesinin ismi "${setName}" olarak değiştirildi, bu üye daha önce bu isimlerle kayıt olmuş.
 
-**Bu kişi daha önce şu isimlerle kayıt olmuş;**
-${data ? data.names.splice(0, 10).map((x, i) => `\`${i + 1}.\` \`${x.name}\` (${x.rol}) , (<@${x.yetkili}>) , **[**\`${moment(x.date).format("LLL")}\`**]**`).join("\n") : ""}
+${red} üyesinin toplamda **${data ? `${data.names.length}` : "0"}** isim kayıtı bulundu
+${data ? data.names.splice(0, 3).map((x, i) => `\`${x.name}\` (${x.rol}) (<@${x.yetkili}>)`).join("\n") : "Daha önce kayıt olmamış."}
+
+Üyesinin önceki isimlerine \`.isimler <@Ozi/ID>\` komutuyla bakarak kayıt işlemini gerçekleştirmeniz önerilir.
     `)
-.setAuthor(uye.displayName, uye.user.displayAvatarURL({ dynamic: true }))
-.setThumbnail(uye.user.displayAvatarURL({ dynamic: true, size: 2048 })))
+.setAuthor(message.guild.name, message.guild.iconURL({ dynamic: true, size: 2048 })))
     await isimler.findOneAndUpdate({ guildID: message.guild.id, userID: uye.user.id }, { $push: { names: { name: setName, yetkili: message.author.id,  rol: "İsim Değiştirme", date: Date.now() } } }, { upsert: true });
 
 }   }
