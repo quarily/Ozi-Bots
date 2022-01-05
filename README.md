@@ -8,14 +8,14 @@
 
 - Events Select Menu de ki rol idleri doldurmanız lazım, emoji sunucu ayar vesaire ayarladıktan sonra baslatmaya geldik npm i yapıyoruz ardından axios modülü yüklenmediği için npm i axios yapiyoruz eğer canvas yüklenmezse bazılarında hata oluyomus npm i canvas yapabilirsiniz botunuz hazır esenlikle kalın.
 
-Theark ve Aris'e codeları için tesekkürler...
+Thearks'a codeları için tesekkürler...
 
 ![image](https://user-images.githubusercontent.com/92666466/147513264-07179317-e51a-43d1-bace-25d611c02c19.png)
 ![image](https://user-images.githubusercontent.com/92666466/145694537-015938d5-b724-47cc-b93a-bb63d95288fe.png)
 ![image](https://user-images.githubusercontent.com/92666466/144712859-7574c3e0-2f3c-4e60-8d57-4d9e9b5170bd.png)
 ![image](https://user-images.githubusercontent.com/92666466/144712851-feffdc3d-46d7-4bfc-addb-043bc4d6acba.png)
 ![image](https://user-images.githubusercontent.com/92666466/141508588-efd16297-700d-41af-9a64-a5f14f0316b3.png)
-![image](https://user-images.githubusercontent.com/92666466/141027859-8fd86201-d257-473d-8022-1edf8e052044.png)
+![image](https://user-images.githubusercontent.com/92666466/148201034-4527c526-7047-40f8-8e93-ad9a5379f1dd.png)
 ![image](https://user-images.githubusercontent.com/92666466/141027606-097f7300-47f4-42d4-a230-42faa1c12546.png)
 ![image](https://user-images.githubusercontent.com/92666466/141028898-ef3e2cad-7209-415a-8a84-201c6e976f9a.png)
 ![image](https://user-images.githubusercontent.com/92666466/139575506-c3d8b1cd-dab1-4c4a-8fc0-89e52b1148df.png)
