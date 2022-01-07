@@ -44,8 +44,25 @@ module.exports = async (member) => {
   let memberGün = moment(member.user.createdAt).format("DD");
   let memberTarih = moment(member.user.createdAt).format("YYYY HH:mm:ss");
   let memberAylar = moment(member.user.createdAt).format("MM").replace("01", "Ocak").replace("02", "Şubat").replace("03", "Mart").replace("04", "Nisan").replace("05", "Mayıs").replace("06", "Haziran").replace("07", "Temmuz").replace("08", "Ağustos").replace("09", "Eylül").replace("10", "Ekim").replace("11", "Kasım").replace("12", "Aralık");
-  let üyesayısı = member.guild.members.cache.size.toString().replace(/ /g, "    ")
-    
+
+  var üyesayısı = member.guild.members.cache.size.toString().replace(/ /g, "    ")
+        var üs = üyesayısı.match(/([0-9])/g)
+        üyesayısı = üyesayısı.replace(/([a-zA-Z])/g, "bilinmiyor").toLowerCase()
+        if(üs) {
+          üyesayısı = üyesayısı.replace(/([0-9])/g, d => {
+            return {
+              '0': `0`,
+              '1': `1`,
+              '2': `2`,
+              '3': `3`,
+              '4': `4`,
+              '5': `5`,
+              '6': `6`,
+              '7': `7`,
+              '8': `8`,
+              '9': `9`}[d];
+            })
+          }     
 
   const channel = member.guild.channels.cache.get(ayar.invLogChannel);
   const kayitchannel = member.guild.channels.cache.get(ayar.teyitKanali);
@@ -60,10 +77,10 @@ module.exports = async (member) => {
 
 if (invite === member.guild.vanityURLCode) {
 kayitchannel.wsend(`
-${member.guild.name}'e Hoşgeldin ${member}! Hesabın ${memberGün} ${memberAylar} ${memberTarih} tarihinde oluşturulmuş. ${guvenilirlik ? `Şüpheli! ${red}` : `Güvenli! ${green}` }\n 
-Sunucuya erişebilmek için "V. Confirmed" odalarında kayıt olup isim yaş belirtmen gerekmektedir.\n
-Sunucu kurallarımız ${kurallar} kanalında belirtilmiştir. Unutma sunucu içerisinde ki ceza işlemlerin kuralları okuduğunu varsayarak gerçekleştirilecek.\n
-Seninle beraber **${üyesayısı}** kişiyiz.Sunucu Özel URL tarafından davet edildin! :tada: :tada: :tada:`);
+${member.guild.name}'e Hoş geldin ${member} biz de seni bekliyorduk, hesabın __${memberGün} ${memberAylar} ${memberTarih}__ tarihinde \`` + moment(member.user.createdTimestamp).fromNow() + `\` oluşturulmuş ${guvenilirlik ? `Şüpheli! ${red}` : `Güvenli! ${green}` }\n
+Sunucumuza **${member.guild.name}** üyesinin davetiyle katıldın ve seninle birlikte ailemiz ${üyesayısı} kişi oldu!\n
+Sunucu kurallarımız ${kurallar} kanalında belirtilmiştir. Unutma sunucu içerisinde ki \`ceza-i işlemler\` kuralları okuduğunu varsayarak gerçekleştirilecek.\n
+Tagımıza ulaşmak için herhangi bir kanala \`.tag\` yazabilirsiniz. :tada: :tada: :tada:`);
 channel.wsend(`${member}, sunucuya katıldı! Davet Eden: **Sunucu Özel URL** :tada:`)
 return }
 if (!invite.inviter) return;
@@ -80,10 +97,10 @@ await inviterSchema.findOneAndUpdate({ guildID: member.guild.id, userID: invite.
 const inviterData = await inviterSchema.findOne({ guildID: member.guild.id, userID: invite.inviter.id });
 const total = inviterData ? inviterData.total : 0;
 kayitchannel.wsend(`
-${member.guild.name}'e Hoşgeldin ${member}! Hesabın ${memberGün} ${memberAylar} ${memberTarih} tarihinde oluşturulmuş. ${guvenilirlik ? `Şüpheli! ${red}` : `Güvenli! ${green}` }\n 
-Sunucuya erişebilmek için "V. Confirmed" odalarında kayıt olup isim yaş belirtmen gerekmektedir.\n
-Sunucu kurallarımız ${kurallar} kanalında belirtilmiştir. Unutma sunucu içerisinde ki ceza işlemlerin kuralları okuduğunu varsayarak gerçekleştirilecek.\n
-Seninle beraber **${üyesayısı}** kişiyiz.${invite.inviter} tarafından davet edildin ve bu kişinin ${total} daveti oldu! :tada: :tada: :tada:`);
+${member.guild.name}'e Hoş geldin ${member} biz de seni bekliyorduk, hesabın __${memberGün} ${memberAylar} ${memberTarih}__ tarihinde \`` + moment(member.user.createdTimestamp).fromNow() + `\` oluşturulmuş ${guvenilirlik ? `Şüpheli! ${red}` : `Güvenli! ${green}` }\n
+Sunucumuza **${invite.inviter}** üyesinin davetiyle katıldın ve seninle birlikte ailemiz ${üyesayısı} kişi oldu!\n
+Sunucu kurallarımız ${kurallar} kanalında belirtilmiştir. Unutma sunucu içerisinde ki \`ceza-i işlemler\` kuralları okuduğunu varsayarak gerçekleştirilecek.\n
+Tagımıza ulaşmak için herhangi bir kanala \`.tag\` yazabilirsiniz. :tada: :tada: :tada:`);
 channel.wsend(`${member}, ${invite.inviter.tag} davetiyle katıldı! (**${total}**)`)
 }
 await coin.findOneAndUpdate({ guildID: member.guild.id, userID: invite.inviter.id }, { $inc: { coin: 1 } }, { upsert: true });
