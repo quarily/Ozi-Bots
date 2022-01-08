@@ -1,83 +1,86 @@
-const Canvas = require("canvas");
-const { MessageAttachment } = require("discord.js") 
+const { MessageEmbed } = require("discord.js"); 
 const moment = require("moment");
-moment.locale("tr");
+const isimler = require("../../schemas/names");
+const conf = require("../../configs/settings.json");
+const Ayarlar = require("../../configs/sunucuayar.json");
+
+require("moment-duration-format")
+moment.locale("tr")
 module.exports = {
     conf: {
-      aliases: ["profil","kb"],
-      name: "profil",
-      help: "profil"
+      aliases: ["kullanıcıbilgi", "kb", "istatistik", "info"],
+      name: "kullanıcıbilgi",
+      help: "kullanıcıbilgi"
     },
   
-run: async (client, message, args, embed, prefix) => {
-  const kullanıcı = message.mentions.users.first() || client.users.cache.get(args[0]) || (args.length > 0 ? client.users.cache.filter(e => e.username.toLowerCase().includes(args.join(" ").toLowerCase())).first(): message.author) || message.author;
-  let member = message.guild.member(kullanıcı);
+run: async (client, message, args, prefix) => {
 
-
-  const applyText = (canvas, text) => {
-    const ctx = canvas.getContext('2d');
-
-    let fontSize = 70;
-
-    do {
-        ctx.font = `${fontSize -= 10}px sans-serif`;
-    } while (ctx.measureText(text).width > canvas.width - 300);
-
-    return ctx.font;
-};
-    const canvas = Canvas.createCanvas(600, 550);
-    const ctx = canvas.getContext('2d');
-
-    const background = await Canvas.loadImage('https://media.discordapp.net/attachments/899273632696631365/901577377996492880/Untitled_design_4.png?width=410&height=473');
-     ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
-
-    ctx.strokeStyle = '#ffffff';
-    ctx.strokeRect(0, 0, canvas.width, canvas.height);
-
-  let yazıqwe = `${member.user.username}`
-  if(yazıqwe.length >= 17) {yazı = `İsmin Çok Uzun`}
-  ctx.font ='45px bebas neue',
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText(`${yazıqwe}`, canvas.width / 2.50, canvas.height / 7);
-
-  ctx.font ='28px bebas neue',
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText(`${message.author.id}`, canvas.width / 2.60, canvas.height / 4.2);
-
-  ctx.font ='30px bebas neue',
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText(`Sunucuya Giriş Tarihi:`, canvas.width / 11, canvas.height / 2);
+  let üye = message.mentions.members.first() || message.guild.members.cache.get(args[0]) || message.member;
+  if (üye.user.bot) return;
   
-  let ktarihi = `${moment(message.author.joinedAt).format('D/MMMM/YYYY')}`
-  ctx.font ='30px bebas neue',
-  ctx.fillStyle = '#ffffff';
-  ctx.fillText(`${ktarihi}`, canvas.width / 1.70 , canvas.height / 2);
+  let registerData = await isimler.findOne({ guildID: message.guild.id, userID: üye.id });
 
-  let otarihi = `${moment(message.author.createdAt).format('D/MMMM/YYYY')}`
-  ctx.font ='30px bebas neue',
-  ctx.fillStyle = '#ffffff';
-  ctx.fillText(`${otarihi}`, canvas.width / 1.70 , canvas.height / 2.60);
+           const roles = üye.roles.cache.filter(role => role.id !== message.guild.id).sort((a, b) => b.position - a.position).map(role => `<@&${role.id}>`);
+            const rolleri = []
+            if (roles.length > 6) {
+                const lent = roles.length - 6
+                let itemler = roles.slice(0, 6)
+                itemler.map(x => rolleri.push(x))
+                rolleri.push(`${lent} daha...`)
+            } else {
+                roles.map(x => rolleri.push(x))
+            }
+            const members = message.guild.members.cache.filter(x => !x.user.bot).array().sort((a, b) => a.joinedTimestamp - b.joinedTimestamp);
+            const joinPos = members.map((u) => u.id).indexOf(üye.id);
+            const previous = members[joinPos - 1] ? members[joinPos - 1].user : null;
+            const next = members[joinPos + 1] ? members[joinPos + 1].user : null;
+            const bilgi = `${previous ? `**${previous.tag}** > ` : ""}<@${üye.id}>${next ? ` > **${next.tag}**` : ""}`
+            let member = message.guild.members.cache.get(üye.id)
+            let nickname = member.displayName == üye.username ? "" + üye.username + " [Yok] " : member.displayName
 
-  ctx.font ='30px bebas neue',
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText(`Discorda Katılım Tarihi:`, canvas.width / 11, canvas.height / 2.60);
- 
-  let ta = `Katılım Sırası:
-${(message.guild.members.cache.filter(a => a.joinedTimestamp <= member.joinedTimestamp).size).toLocaleString()}/${(message.guild.memberCount).toLocaleString()}`
-  ctx.font ='28px bebas neue',
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText(`${ta}`, canvas.width / 1.80, canvas.height / 1.55);
+  let embed = new MessageEmbed().setAuthor(üye.displayName, üye.user.avatarURL({ dynamic: true })).setTimestamp().setColor(üye.displayHexColor).setFooter(message.author.tag, message.author.avatarURL({ dynamic: true })).setThumbnail(üye.user.avatarURL({ dynamic: true }))
+    .addField(`❯ Kullanıcı Bilgisi`,`
+\`•\` Hesap: ${üye}
+\`•\` Kullanıcı ID: ${üye.id}
+\`•\` Durum: ${üye.user.presence.activities.length > 0 ? üye.user.presence.activities.map(e => e.name).join(", ") : "Aktivite Bulunmamakta"}
+\`•\` Kuruluş Tarihi: ${moment(üye.user.createdAt).format(`DD/MM/YYYY | HH:mm`)} (${moment(üye.user.createdAt).add(5, 'gün').fromNow().replace("birkaç saniye önce", " ")}.)
+`)
+    .addField(`❯ Sunucu Bilgisi`,`
+\`•\` Sunucu İsmi: ${nickname}
+\`•\` Katılım Tarihi: ${moment(üye.joinedAt).format(`DD/MM/YYYY | HH:mm`)} (${moment(üye.joinedAt).add(5, 'gün').fromNow().replace("birkaç saniye önce", " ")}.)
+\`•\` Katılım Sırası: ${(message.guild.members.cache.filter(a => a.joinedTimestamp <= üye.joinedTimestamp).size).toLocaleString()}/${(message.guild.memberCount).toLocaleString()}
+\`•\` Katılım Bilgisi: ${bilgi}
 
-  let roll = `Rolleri : 
-${member.roles.cache.size <= 4 ? member.roles.cache.filter(x => x.name !== "@everyone").map(x => x.name).join('\n') : `Listelenemedi. (${member.roles.cache.size})`}`
-  ctx.font ='28px bebas neue',
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText(`${roll}`, canvas.width / 11, canvas.height / 1.55);
+\`•\` Bazı Rolleri: (${rolleri.length}): ${rolleri.join(", ")}
+\`•\` İsim geçmişi:  **${registerData ? `${registerData.names.length}` : "0"}** ${registerData ? registerData.names.splice(0, 1).map((x, i) => `\`${x.name}\` (${x.rol}) (<@${x.yetkili}>)`).join("\n") : ""}
+`);
+  if (üye.hasPermission("ADMINISTRATOR") || Ayarlar.teyitciRolleri.some(x => üye.roles.cache.has(x))) 
+    embed.addField(`❯ Yetkili Bilgisi`,
+`• Toplam kayıt: ${registerData ? registerData.top : 0} • Erkek kayıt : ${registerData ? registerData.erkek : 0} • Kadın kayıt : ${registerData ? registerData.kız : 0} •`)
+  message.lineReply(embed);
 
+  
+  if (üye.presence.activities.some(x => x.name == "Spotify" && x.type == "LISTENING")) {
+    let presence = üye.presence.activities.find(x => x.name == "Spotify");
+    let x = Date.parse(presence.timestamps.start)
+    let y = Date.parse(presence.timestamps.end)
+    let progressBar = ["▬", "▬", "▬", "▬", "▬", "▬", "▬", "▬", "▬", "▬", "▬", "▬", "▬"];
+    let time = Date.now() - presence.timestamps.start
+    let time2 = y - x
+    let momi = moment.duration(time).format("mm[:]ss")
+    if (momi.length === 2) {
+      momi = '00:'.concat(momi)
+    }
+    let calcul = Math.round(progressBar.length * (time / time2));
+    progressBar[calcul] = "🟢"
+    message.lineReply(new MessageEmbed().setAuthor("Spotify bilgi                                                                ", client.user.avatarURL()).setColor("#07c41d").setImage(`https://i.scdn.co/image/${presence.assets.largeImage.slice(8)}`).setDescription(
+`​ \`Şarkı ismi\`: [**${presence.details}**](https://open.spotify.com/track/${presence.syncID}) 
+​ \`Sanatçı\`: **${presence.state.includes("Teoman") ? "TEOMAN!" : presence.state}**
+​ \`Albüm\`: **${presence.assets.largeText}**   
+​ \`(${momi}/${moment.duration(y - x).format("m[:]ss")})\` ${progressBar.join('')}`
+    ));
+  }
+  
+}
+}
 
-    const avatar = await Canvas.loadImage(member.user.displayAvatarURL({ format: 'jpg' }));
-    ctx.drawImage(avatar, 40, 40, 125, 125);
-
-  const attachment = new MessageAttachment(canvas.toBuffer(), 'ozi.png');
-  message.channel.send(`[ __${member}__ ] kişisinin kullanıcı profili ;`, attachment)
-    }}
