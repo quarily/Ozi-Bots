@@ -73,7 +73,7 @@ run: async (client, message, args, prefix) => {
     }
     let calcul = Math.round(progressBar.length * (time / time2));
     progressBar[calcul] = "🟢"
-    message.lineReply(new MessageEmbed().setAuthor("Spotify bilgi                                                                ", client.user.avatarURL()).setColor("#07c41d").setImage(`https://i.scdn.co/image/${presence.assets.largeImage.slice(8)}`).setDescription(
+    message.lineReply(new MessageEmbed().setAuthor("Spotify bilgi", client.user.avatarURL()).setColor("#07c41d").setImage(`https://i.scdn.co/image/${presence.assets.largeImage.slice(8)}`).setDescription(
 `​ \`Şarkı ismi\`: [**${presence.details}**](https://open.spotify.com/track/${presence.syncID}) 
 ​ \`Sanatçı\`: **${presence.state.includes("Teoman") ? "TEOMAN!" : presence.state}**
 ​ \`Albüm\`: **${presence.assets.largeText}**   
