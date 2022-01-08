@@ -5,6 +5,7 @@ const inviteMemberSchema = require("../schemas/inviteMember");
 const coin = require("../schemas/coin");
 const gorev = require("../schemas/invite");
 const otokayit = require("../schemas/otokayit");
+const bannedTag = require("../schemas/bannedTag");
 const regstats = require("../schemas/registerStats");
 const conf = require("../configs/sunucuayar.json");
 const ayar = require("../configs/sunucuayar.json")
@@ -74,6 +75,18 @@ module.exports = async (member) => {
   const invites = await member.guild.fetchInvites();
   const invite = invites.find((x) => gi.has(x.code) && gi.get(x.code).uses < x.uses) || gi.find((x) => !invites.has(x.code)) || member.guild.vanityURLCode;
   client.invites.set(member.guild.id, invites);
+
+await bannedTag.findOne({ guildID: settings.guildID }, async ( err, res) => {
+
+  res.taglar.forEach(async x => {
+
+  if(res.taglar.some(x => member.user.username.includes(x))) { 
+    await member.roles.set(ayar.jailRole)
+    await member.setNickname("Yasaklı Tag")
+    if (settings.dmMessages) member.send(`${member.guild.name} adlı sunucumuza olan erişiminiz engellendi! Sunucumuzda yasaklı olan bir simgeyi (${x}) isminizde taşımanızdan dolayıdır. Sunucuya erişim sağlamak için simgeyi (${x}) isminizden çıkartmanız gerekmektedir.\n\nSimgeyi (${x}) isminizden kaldırmanıza rağmen üstünüzde halen Yasaklı Tag rolü varsa sunucudan gir çık yapabilirsiniz veya sağ tarafta bulunan yetkililer ile iletişim kurabilirsiniz. **-Yönetim**\n\n__Sunucu Tagımız__\n**${conf.tag}**`).catch(() => {});
+}
+})
+})
 
 if (invite === member.guild.vanityURLCode) {
 kayitchannel.wsend(`
