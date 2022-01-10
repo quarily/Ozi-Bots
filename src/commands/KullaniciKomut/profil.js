@@ -1,6 +1,7 @@
 const { MessageEmbed } = require("discord.js"); 
 const moment = require("moment");
 const isimler = require("../../schemas/names");
+const register = require("../../schemas/registerStats");
 const conf = require("../../configs/settings.json");
 const Ayarlar = require("../../configs/sunucuayar.json");
 
@@ -18,7 +19,8 @@ run: async (client, message, args, prefix) => {
   let üye = message.mentions.members.first() || message.guild.members.cache.get(args[0]) || message.member;
   if (üye.user.bot) return;
   
-  let registerData = await isimler.findOne({ guildID: message.guild.id, userID: üye.id });
+  let nameData = await isimler.findOne({ guildID: message.guild.id, userID: üye.id });
+  let registerData = await register.findOne({ guildID: message.guild.id, userID: üye.id });
 
            const roles = üye.roles.cache.filter(role => role.id !== message.guild.id).sort((a, b) => b.position - a.position).map(role => `<@&${role.id}>`);
             const rolleri = []
@@ -52,7 +54,7 @@ run: async (client, message, args, prefix) => {
 \`•\` Katılım Bilgisi: ${bilgi}
 
 \`•\` Bazı Rolleri: (${rolleri.length}): ${rolleri.join(", ")}
-\`•\` İsim geçmişi:  **${registerData ? `${registerData.names.length}` : "0"}** ${registerData ? registerData.names.splice(0, 1).map((x, i) => `\`${x.name}\` (${x.rol}) (<@${x.yetkili}>)`).join("\n") : ""}
+\`•\` İsim geçmişi:  **${nameData ? `${nameData.names.length}` : "0"}** ${nameData ? nameData.names.splice(0, 1).map((x, i) => `\`${x.name}\` (${x.rol}) (<@${x.yetkili}>)`).join("\n") : ""}
 `);
   if (üye.hasPermission("ADMINISTRATOR") || Ayarlar.teyitciRolleri.some(x => üye.roles.cache.has(x))) 
     embed.addField(`❯ Yetkili Bilgisi`,
