@@ -8,6 +8,7 @@ module.exports = {
     },
   
 run: async (client, message, args, embed, prefix) => {
+if (message.member.displayName.includes("[AFK]")) return
 const reason = args.join(" ") || "Belirtilmedi!";
 await afk.findOneAndUpdate({ guildID: message.guild.id, userID: message.author.id }, { $set: { reason, date: Date.now() } }, { upsert: true });
 message.react(green)
