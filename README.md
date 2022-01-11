@@ -30,7 +30,6 @@ Thearkxd ve Aris'e codeları için tesekkürler...
 ![image](https://user-images.githubusercontent.com/92666466/139575586-93156301-2cc4-45c2-a167-b82d51fa846f.png)
 ![image](https://user-images.githubusercontent.com/92666466/140218451-006119ee-7a23-41ce-8f1d-bf8c42f0b560.png)
 ![image](https://user-images.githubusercontent.com/92666466/139575596-53f98cee-5570-4bff-ad13-20393edb2470.png)
-![image](https://user-images.githubusercontent.com/92666466/139575625-fac22ea2-5911-41b9-9692-9de1d896bd3b.png)
 ![image](https://user-images.githubusercontent.com/92666466/139575362-1562a395-5352-4528-b336-5400ef7abe11.png)
 ![image](https://user-images.githubusercontent.com/92666466/139575369-b977aef8-b890-451f-bb9b-b6797ab6cc67.png)
 ![image](https://user-images.githubusercontent.com/92666466/139575301-3eb0eb45-8327-49c8-85fe-71fbc39476b3.png)
