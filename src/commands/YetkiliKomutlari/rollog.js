@@ -19,7 +19,7 @@ help: "rollog"
         if (!Veri) return this.client.yolla("<@" + Member.id + "> kişisinin rol bilgisi veritabanında bulunmadı.", message.author, message.channel)
         let page = 1;
         let rol = Veri.roller.sort((a, b) => b.tarih - a.tarih)
-        let liste = rol.map(x => `${x.state == "Ekleme" ? red : green } Rol: <@&${x.rol}> Yetkili: <@${x.mod}>\nTarih: ${x.tarih}`)
+        let liste = rol.map(x => `${x.state == "Ekleme" ? green : red } Rol: <@&${x.rol}> Yetkili: <@${x.mod}>\nTarih: ${x.tarih}`)
         var msg = await message.channel.send(new Discord.MessageEmbed().setDescription(`${Member} kişisinin toplamda ${Veri.roller.length} rol bilgisi bulunmakta, rollerin bilgileri aşağıda belirtilmiştir.\n\n ${liste.slice(page == 1 ? 0 : page * 10 - 10, page * 10).join('\n─────────────────\n')}`).setColor("RANDOM").setAuthor(Member.user.tag, Member.user.avatarURL({ dynamic: true }), `https://discord.com/users/${Member.id}`));
         if (liste.length > 10) {
             await msg.react(`⬅️`);
